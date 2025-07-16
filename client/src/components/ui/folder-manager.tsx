@@ -22,7 +22,7 @@ export default function FolderManager({ folders, selectedFolderId, onFolderSelec
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [editingFolder, setEditingFolder] = useState<Folder | null>(null);
   const [newFolderName, setNewFolderName] = useState("");
-  const [newFolderParent, setNewFolderParent] = useState<string>("");
+  const [newFolderParent, setNewFolderParent] = useState<string>("root");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -35,7 +35,7 @@ export default function FolderManager({ folders, selectedFolderId, onFolderSelec
       queryClient.invalidateQueries({ queryKey: ["/api/folders"] });
       setShowCreateDialog(false);
       setNewFolderName("");
-      setNewFolderParent("");
+      setNewFolderParent("root");
       toast({
         title: "Success",
         description: "Folder created successfully",
@@ -107,14 +107,14 @@ export default function FolderManager({ folders, selectedFolderId, onFolderSelec
     
     createFolderMutation.mutate({
       name: newFolderName.trim(),
-      parentId: newFolderParent ? parseInt(newFolderParent) : null,
+      parentId: newFolderParent && newFolderParent !== "root" ? parseInt(newFolderParent) : null,
     });
   };
 
   const handleEditFolder = (folder: Folder) => {
     setEditingFolder(folder);
     setNewFolderName(folder.name);
-    setNewFolderParent(folder.parentId?.toString() || "");
+    setNewFolderParent(folder.parentId?.toString() || "root");
     setShowEditDialog(true);
   };
 
@@ -124,7 +124,7 @@ export default function FolderManager({ folders, selectedFolderId, onFolderSelec
     updateFolderMutation.mutate({
       id: editingFolder.id,
       name: newFolderName.trim(),
-      parentId: newFolderParent ? parseInt(newFolderParent) : null,
+      parentId: newFolderParent && newFolderParent !== "root" ? parseInt(newFolderParent) : null,
     });
   };
 
@@ -178,7 +178,7 @@ export default function FolderManager({ folders, selectedFolderId, onFolderSelec
                   <SelectValue placeholder="Select parent folder" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No parent (root level)</SelectItem>
+                  <SelectItem value="root">No parent (root level)</SelectItem>
                   {folders.map((folder) => (
                     <SelectItem key={folder.id} value={folder.id.toString()}>
                       {folder.name}
@@ -225,7 +225,7 @@ export default function FolderManager({ folders, selectedFolderId, onFolderSelec
                   <SelectValue placeholder="Select parent folder" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No parent (root level)</SelectItem>
+                  <SelectItem value="root">No parent (root level)</SelectItem>
                   {getAvailableParents(editingFolder?.id).map((folder) => (
                     <SelectItem key={folder.id} value={folder.id.toString()}>
                       {folder.name}

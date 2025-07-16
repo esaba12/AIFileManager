@@ -18,7 +18,7 @@ interface FileActionsProps {
 export default function FileActions({ file, folders, onClose }: FileActionsProps) {
   const [showMoveDialog, setShowMoveDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [selectedFolderId, setSelectedFolderId] = useState<string>("");
+  const [selectedFolderId, setSelectedFolderId] = useState<string>("root");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -71,7 +71,7 @@ export default function FileActions({ file, folders, onClose }: FileActionsProps
   });
 
   const handleMoveFile = () => {
-    const folderId = selectedFolderId ? parseInt(selectedFolderId) : null;
+    const folderId = selectedFolderId && selectedFolderId !== "root" ? parseInt(selectedFolderId) : null;
     moveFileMutation.mutate({
       fileId: file.id,
       folderId,
@@ -139,7 +139,7 @@ export default function FileActions({ file, folders, onClose }: FileActionsProps
                   <SelectValue placeholder="Select destination folder" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Unstructured (No folder)</SelectItem>
+                  <SelectItem value="root">Unstructured (No folder)</SelectItem>
                   {folders.map((folder) => (
                     <SelectItem key={folder.id} value={folder.id.toString()}>
                       {folder.name}
