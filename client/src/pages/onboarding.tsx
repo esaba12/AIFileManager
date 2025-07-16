@@ -9,7 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowRight, ArrowLeft, Check, HardDrive, Cloud, Shield, Zap, DollarSign, CheckCircle } from "lucide-react";
+import { ArrowRight, ArrowLeft, Check, HardDrive, Cloud, Shield, Zap, DollarSign, CheckCircle, Mic } from "lucide-react";
+import VoiceButton from "@/components/ui/voice-button";
+import VoiceAssistant from "@/components/ui/voice-assistant";
 
 const industries = [
   { value: "real-estate", label: "Real Estate", description: "Property listings, contracts, client docs" },
@@ -219,12 +221,18 @@ export default function Onboarding() {
         return (
           <div>
             <h4 className="text-lg font-semibold text-gray-900 mb-4">Tell us about your business</h4>
-            <Textarea
-              value={formData.businessDescription}
-              onChange={(e) => setFormData({ ...formData, businessDescription: e.target.value })}
-              placeholder="Example: I run a real estate business and need to organize property contracts, listing agreements, inspection reports, client communications, tax documents, and marketing materials."
-              className="min-h-[120px]"
-            />
+            <div className="space-y-3">
+              <Textarea
+                value={formData.businessDescription}
+                onChange={(e) => setFormData({ ...formData, businessDescription: e.target.value })}
+                placeholder="Example: I run a real estate business and need to organize property contracts, listing agreements, inspection reports, client communications, tax documents, and marketing materials."
+                className="min-h-[120px]"
+              />
+              <VoiceButton
+                onTranscript={(text) => setFormData({ ...formData, businessDescription: text })}
+                className="w-full"
+              />
+            </div>
           </div>
         );
 
@@ -461,12 +469,18 @@ export default function Onboarding() {
         return (
           <div>
             <h4 className="text-lg font-semibold text-gray-900 mb-4">Describe your ideal folder structure</h4>
-            <Textarea
-              value={formData.folderStructure}
-              onChange={(e) => setFormData({ ...formData, folderStructure: e.target.value })}
-              placeholder="Example: I want folders organized by property address, with subfolders for contracts, inspections, communications, and closing documents. Also need a general folder for templates and marketing materials."
-              className="min-h-[120px]"
-            />
+            <div className="space-y-3">
+              <Textarea
+                value={formData.folderStructure}
+                onChange={(e) => setFormData({ ...formData, folderStructure: e.target.value })}
+                placeholder="Example: I want folders organized by property address, with subfolders for contracts, inspections, communications, and closing documents. Also need a general folder for templates and marketing materials."
+                className="min-h-[120px]"
+              />
+              <VoiceButton
+                onTranscript={(text) => setFormData({ ...formData, folderStructure: text })}
+                className="w-full"
+              />
+            </div>
             
             {formData.folderStructure && (
               <div className="mt-6">
@@ -556,6 +570,101 @@ export default function Onboarding() {
         </CardHeader>
         
         <CardContent className="space-y-6">
+          {/* Voice Assistant Option */}
+          <VoiceAssistant
+            questions={[
+              "What industry are you in? For example, real estate, legal services, accounting, or something else?",
+              "What's your team size? Are you working solo, with a small team of 2-10 people, or a medium team of 11-50 people?",
+              "Tell me about your business and what documents you need to organize.",
+              "What types of documents do you work with most? For example, contracts, invoices, reports, photos, or legal documents?",
+              "How do you prefer to organize your files? By client, by project, by document type, by date, or a mixed approach?",
+              "Who will be accessing these files? Just you, your team members, clients, or a mix?",
+              "Do you prefer local storage on your device or cloud storage for accessibility?",
+              "Describe your ideal folder structure. How would you like your documents organized?"
+            ]}
+            onAnswers={(answers) => {
+              // Map voice answers to form data
+              const industryMap: { [key: string]: string } = {
+                "real estate": "real-estate",
+                "legal": "legal",
+                "accounting": "accounting"
+              };
+              
+              const teamMap: { [key: string]: string } = {
+                "solo": "solo",
+                "small": "small",
+                "medium": "medium"
+              };
+              
+              const orgMap: { [key: string]: string } = {
+                "client": "by-client",
+                "project": "by-project",
+                "type": "by-type",
+                "date": "by-date",
+                "mixed": "mixed"
+              };
+              
+              const collabMap: { [key: string]: string } = {
+                "individual": "individual",
+                "team": "team-shared",
+                "client": "client-shared",
+                "mixed": "mixed"
+              };
+
+              // Parse answers intelligently
+              const industry = Object.keys(industryMap).find(key => 
+                answers[0]?.toLowerCase().includes(key)
+              ) || "other";
+              
+              const teamSize = Object.keys(teamMap).find(key => 
+                answers[1]?.toLowerCase().includes(key)
+              ) || "solo";
+              
+              const organizationMethod = Object.keys(orgMap).find(key => 
+                answers[4]?.toLowerCase().includes(key)
+              ) || "by-client";
+              
+              const collaborationStyle = Object.keys(collabMap).find(key => 
+                answers[5]?.toLowerCase().includes(key)
+              ) || "individual";
+              
+              const documentTypes = [
+                "Contracts", "Invoices", "Reports", "Photos", "Legal Documents",
+                "Financial Records", "Marketing Materials", "Templates", "Client Files"
+              ].filter(type => 
+                answers[3]?.toLowerCase().includes(type.toLowerCase())
+              );
+              
+              const storageType = answers[6]?.toLowerCase().includes("cloud") ? "cloud" : "local";
+
+              setFormData({
+                ...formData,
+                industry: industryMap[industry] || industry,
+                teamSize: teamMap[teamSize] || teamSize,
+                businessDescription: answers[2] || "",
+                documentTypes: documentTypes.length > 0 ? documentTypes : ["Other"],
+                organizationMethod: orgMap[organizationMethod] || organizationMethod,
+                collaborationStyle: collabMap[collaborationStyle] || collaborationStyle,
+                storageType: storageType as "local" | "cloud",
+                folderStructure: answers[7] || ""
+              });
+              
+              // Skip to final step
+              setCurrentStep(8);
+            }}
+            isProcessing={onboardingMutation.isPending}
+            triggerText="🎤 Talk to Assistant (Complete Setup by Voice)"
+          />
+          
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-gray-50 px-2 text-gray-500">or fill out manually</span>
+            </div>
+          </div>
+          
           {renderStep()}
           
           <div className="flex justify-between pt-4">

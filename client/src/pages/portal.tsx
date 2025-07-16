@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Upload, User } from "lucide-react";
+import { Search, Upload, User, Mic } from "lucide-react";
+import VoiceButton from "@/components/ui/voice-button";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -99,15 +100,22 @@ export default function Portal() {
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center space-x-4">
             <h1 className="text-xl font-bold text-gray-900">AI Filing Platform</h1>
-            <div className="relative">
-              <Input
-                type="text"
-                placeholder="Search documents..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-64 pl-10"
+            <div className="flex items-center space-x-2">
+              <div className="relative">
+                <Input
+                  type="text"
+                  placeholder="Search documents..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-64 pl-10"
+                />
+                <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+              </div>
+              <VoiceButton
+                onTranscript={(text) => setSearchQuery(text)}
+                size="sm"
+                variant="outline"
               />
-              <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
             </div>
           </div>
           <div className="flex items-center space-x-4">

@@ -10,14 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-- **January 16, 2025**: Enhanced onboarding with detailed file structure questions
-  - Added comprehensive document type selection (contracts, invoices, reports, etc.)
-  - Added organization method preferences (by-client, by-project, by-type, by-date, mixed)
-  - Added collaboration style questions (individual, team-shared, client-shared, mixed)
-  - Enhanced AI folder structure generation with detailed user preferences
-  - Extended onboarding flow to 8 steps for more accurate file organization
-  - Updated database schema to capture detailed file structure preferences
-  - AI now uses document types, organization method, and collaboration style for better folder suggestions
+- **January 16, 2025**: Added voice capabilities for enhanced accessibility
+  - Voice recognition for answering onboarding questions by speech
+  - "Talk to Assistant" feature for complete voice-based setup
+  - Voice search capability in the filing system
+  - Intelligent voice-to-text processing with smart answer mapping
+  - Enhanced accessibility for small business owners
+  - Voice buttons on text input fields throughout the interface
+  - Speech synthesis to read questions aloud during voice setup
 
 ## System Architecture
 
@@ -66,14 +66,16 @@ Preferred communication style: Simple, everyday language.
   - Smart folder structure creation
   - Business-specific organization suggestions
 - **OCR**: Tesseract.js for text extraction from images and scanned documents
+- **Voice Processing**: Web Speech API for voice recognition and synthesis
 
 ### User Interface
 - **Design System**: Consistent component library with dark/light mode support
 - **Responsive Design**: Mobile-first approach with adaptive layouts
 - **File Management**: Drag-and-drop upload with processing options
-- **Search**: Real-time file and folder search functionality
+- **Search**: Real-time file and folder search functionality with voice input
 - **Preview**: Modal-based file preview system
-- **Storage Selection**: User-friendly interface for choosing storage options during onboarding
+- **Voice Interface**: Speech recognition for text input and complete voice-based setup
+- **Accessibility**: Voice capabilities for users who prefer speaking over typing
 
 ## Data Flow
 
