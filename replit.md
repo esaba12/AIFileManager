@@ -10,12 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-- **January 16, 2025**: Added storage option selection during onboarding
-  - Users can now choose between local storage (free) and cloud storage (paid plans)
-  - Added clear explanations of pros/cons for each storage type
-  - Integrated pricing tiers for cloud storage: Basic ($9/month), Standard ($19/month), Premium ($39/month)
-  - Updated database schema to include storageType and storagePlan fields
-  - Enhanced onboarding flow with storage selection as step 4 of 5
+- **January 16, 2025**: Enhanced onboarding with detailed file structure questions
+  - Added comprehensive document type selection (contracts, invoices, reports, etc.)
+  - Added organization method preferences (by-client, by-project, by-type, by-date, mixed)
+  - Added collaboration style questions (individual, team-shared, client-shared, mixed)
+  - Enhanced AI folder structure generation with detailed user preferences
+  - Extended onboarding flow to 8 steps for more accurate file organization
+  - Updated database schema to capture detailed file structure preferences
+  - AI now uses document types, organization method, and collaboration style for better folder suggestions
 
 ## System Architecture
 
@@ -79,10 +81,13 @@ Preferred communication style: Simple, everyday language.
 1. User authenticates via Replit Auth
 2. System creates user profile with basic information
 3. Onboarding flow collects industry, team size, and business description
-4. User selects storage type (local or cloud) with pricing information
-5. AI generates initial folder structure based on business context
-6. User can customize and approve folder structure
-7. System creates folder hierarchy in database
+4. User selects document types they work with most frequently
+5. User chooses preferred organization method (by-client, by-project, etc.)
+6. User specifies collaboration style and access needs
+7. User selects storage type (local or cloud) with pricing information
+8. AI generates initial folder structure based on detailed preferences
+9. User can customize and approve folder structure
+10. System creates folder hierarchy in database
 
 ### File Upload and Processing
 1. User selects files and processing options (OCR, summarization, tagging)

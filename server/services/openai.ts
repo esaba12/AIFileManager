@@ -15,7 +15,10 @@ class OpenAIService {
   async generateFolderStructure(
     industry: string,
     businessDescription: string,
-    userPrompt: string
+    userPrompt: string,
+    documentTypes: string[] = [],
+    organizationMethod: string = "by-client",
+    collaborationStyle: string = "individual"
   ): Promise<FolderStructure[]> {
     try {
       const prompt = `As an AI assistant for document management, create a folder structure for a ${industry} business. 
@@ -24,7 +27,11 @@ Business Description: ${businessDescription}
 
 User Requirements: ${userPrompt}
 
-Create a logical folder hierarchy that would help organize documents for this business. Return the structure as JSON with the following format:
+Document Types: ${documentTypes.join(", ")}
+Organization Method: ${organizationMethod}
+Collaboration Style: ${collaborationStyle}
+
+Create a logical folder hierarchy that would help organize documents for this business. Consider the specific document types they work with and their preferred organization method. Return the structure as JSON with the following format:
 {
   "folders": [
     {

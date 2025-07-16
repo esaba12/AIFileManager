@@ -82,6 +82,12 @@ export default function Onboarding() {
     folderStructure: "",
     storageType: "local",
     storagePlan: "basic",
+    documentTypes: [] as string[],
+    organizationMethod: "by-client",
+    clientTypes: [] as string[],
+    retentionNeeds: "mixed",
+    complianceRequirements: false,
+    collaborationStyle: "individual",
   });
   const [suggestedStructure, setSuggestedStructure] = useState<any>(null);
   const { toast } = useToast();
@@ -109,7 +115,7 @@ export default function Onboarding() {
   });
 
   const handleNext = () => {
-    if (currentStep < 5) {
+    if (currentStep < 8) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -212,17 +218,125 @@ export default function Onboarding() {
       case 3:
         return (
           <div>
-            <h4 className="text-lg font-semibold text-gray-900 mb-4">What documents do you need to organize?</h4>
+            <h4 className="text-lg font-semibold text-gray-900 mb-4">Tell us about your business</h4>
             <Textarea
               value={formData.businessDescription}
               onChange={(e) => setFormData({ ...formData, businessDescription: e.target.value })}
-              placeholder="Example: I need to organize property contracts, listing agreements, inspection reports, client communications, tax documents, and marketing materials for my real estate business."
+              placeholder="Example: I run a real estate business and need to organize property contracts, listing agreements, inspection reports, client communications, tax documents, and marketing materials."
               className="min-h-[120px]"
             />
           </div>
         );
 
       case 4:
+        return (
+          <div>
+            <h4 className="text-lg font-semibold text-gray-900 mb-4">What types of documents do you work with most?</h4>
+            <p className="text-gray-600 mb-4">Select all that apply - this helps us suggest the right folder structure.</p>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                "Contracts", "Invoices", "Reports", "Correspondence", "Photos", "Legal Documents", 
+                "Financial Records", "Marketing Materials", "Templates", "Client Files", "Project Files", "Other"
+              ].map((docType) => (
+                <Label key={docType} className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.documentTypes.includes(docType)}
+                    onChange={(e) => {
+                      const types = e.target.checked 
+                        ? [...formData.documentTypes, docType]
+                        : formData.documentTypes.filter(t => t !== docType);
+                      setFormData({ ...formData, documentTypes: types });
+                    }}
+                    className="rounded border-gray-300"
+                  />
+                  <span>{docType}</span>
+                </Label>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 5:
+        return (
+          <div>
+            <h4 className="text-lg font-semibold text-gray-900 mb-4">How do you prefer to organize your files?</h4>
+            <RadioGroup 
+              value={formData.organizationMethod} 
+              onValueChange={(value) => setFormData({ ...formData, organizationMethod: value as any })}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="by-client" id="by-client" />
+                <Label htmlFor="by-client" className="cursor-pointer">
+                  By client or customer (each client gets their own folder)
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="by-project" id="by-project" />
+                <Label htmlFor="by-project" className="cursor-pointer">
+                  By project or case (each project gets its own folder)
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="by-type" id="by-type" />
+                <Label htmlFor="by-type" className="cursor-pointer">
+                  By document type (contracts, invoices, reports, etc.)
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="by-date" id="by-date" />
+                <Label htmlFor="by-date" className="cursor-pointer">
+                  By date (monthly or yearly folders)
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="mixed" id="mixed" />
+                <Label htmlFor="mixed" className="cursor-pointer">
+                  Mixed approach (combination of the above)
+                </Label>
+              </div>
+            </RadioGroup>
+          </div>
+        );
+
+      case 6:
+        return (
+          <div>
+            <h4 className="text-lg font-semibold text-gray-900 mb-4">Who will be accessing these files?</h4>
+            <p className="text-gray-600 mb-4">This helps us understand your sharing and collaboration needs.</p>
+            <RadioGroup 
+              value={formData.collaborationStyle} 
+              onValueChange={(value) => setFormData({ ...formData, collaborationStyle: value as any })}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="individual" id="individual" />
+                <Label htmlFor="individual" className="cursor-pointer">
+                  Just me (individual use)
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="team-shared" id="team-shared" />
+                <Label htmlFor="team-shared" className="cursor-pointer">
+                  My team members need access to files
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="client-shared" id="client-shared" />
+                <Label htmlFor="client-shared" className="cursor-pointer">
+                  Clients need access to their files
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="mixed" id="mixed-collaboration" />
+                <Label htmlFor="mixed-collaboration" className="cursor-pointer">
+                  Mixed (some files shared, some private)
+                </Label>
+              </div>
+            </RadioGroup>
+          </div>
+        );
+
+      case 7:
         return (
           <div>
             <h4 className="text-lg font-semibold text-gray-900 mb-6">Choose your storage option</h4>
@@ -343,7 +457,7 @@ export default function Onboarding() {
           </div>
         );
 
-      case 5:
+      case 8:
         return (
           <div>
             <h4 className="text-lg font-semibold text-gray-900 mb-4">Describe your ideal folder structure</h4>
@@ -403,8 +517,14 @@ export default function Onboarding() {
       case 3:
         return formData.businessDescription.trim() !== "";
       case 4:
-        return formData.storageType !== "";
+        return formData.documentTypes.length > 0;
       case 5:
+        return formData.organizationMethod !== "";
+      case 6:
+        return formData.collaborationStyle !== "";
+      case 7:
+        return formData.storageType !== "";
+      case 8:
         return formData.folderStructure.trim() !== "";
       default:
         return false;
@@ -420,7 +540,7 @@ export default function Onboarding() {
               Let's Set Up Your Workspace
             </CardTitle>
             <div className="flex space-x-2">
-              {[1, 2, 3, 4, 5].map((step) => (
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((step) => (
                 <div
                   key={step}
                   className={`w-2 h-2 rounded-full ${
@@ -447,7 +567,7 @@ export default function Onboarding() {
             )}
             
             <div className="ml-auto">
-              {currentStep < 5 ? (
+              {currentStep < 8 ? (
                 <Button 
                   onClick={handleNext} 
                   disabled={!isStepValid()}

@@ -59,7 +59,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const folderStructure = await openaiService.generateFolderStructure(
         validatedData.industry,
         validatedData.businessDescription,
-        validatedData.folderStructure
+        validatedData.folderStructure,
+        validatedData.documentTypes,
+        validatedData.organizationMethod,
+        validatedData.collaborationStyle
       );
 
       // Create folders in database

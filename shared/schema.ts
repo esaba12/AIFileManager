@@ -114,6 +114,13 @@ export const onboardingSchema = z.object({
   folderStructure: z.string().min(1),
   storageType: z.enum(["local", "cloud"]).default("local"),
   storagePlan: z.enum(["basic", "standard", "premium"]).default("basic"),
+  // File structure preferences
+  documentTypes: z.array(z.string()).default([]),
+  organizationMethod: z.enum(["by-client", "by-date", "by-project", "by-type", "mixed"]).default("by-client"),
+  clientTypes: z.array(z.string()).default([]),
+  retentionNeeds: z.enum(["short-term", "long-term", "mixed"]).default("mixed"),
+  complianceRequirements: z.boolean().default(false),
+  collaborationStyle: z.enum(["individual", "team-shared", "client-shared", "mixed"]).default("individual"),
 });
 
 export type UpsertUser = z.infer<typeof upsertUserSchema>;
