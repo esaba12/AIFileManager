@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,6 @@ import FileGrid from "@/components/portal/file-grid";
 import AIPanel from "@/components/portal/ai-panel";
 import FileUpload from "@/components/ui/file-upload";
 import FilePreview from "@/components/ui/file-preview";
-import { useEffect } from "react";
 
 export default function Portal() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -22,6 +21,7 @@ export default function Portal() {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showFilePreview, setShowFilePreview] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -38,52 +38,62 @@ export default function Portal() {
     }
   }, [isAuthenticated, isLoading, toast]);
 
+  // Debounce search query for better performance
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Memoized retry function to avoid recreation on each render
+  const retryFunction = useCallback((failureCount: number, error: Error) => {
+    if (isUnauthorizedError(error)) {
+      toast({
+        title: "Unauthorized",
+        description: "You are logged out. Logging in again...",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = "/api/login";
+      }, 500);
+      return false;
+    }
+    return failureCount < 3;
+  }, [toast]);
+
   const { data: folders = [], isLoading: foldersLoading } = useQuery({
     queryKey: ["/api/folders"],
     enabled: isAuthenticated,
-    retry: (failureCount, error) => {
-      if (isUnauthorizedError(error as Error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-        return false;
-      }
-      return failureCount < 3;
-    },
+    retry: retryFunction,
   });
 
   const { data: files = [], isLoading: filesLoading } = useQuery({
     queryKey: ["/api/files", selectedFolderId],
     enabled: isAuthenticated,
-    retry: (failureCount, error) => {
-      if (isUnauthorizedError(error as Error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-        return false;
-      }
-      return failureCount < 3;
-    },
+    retry: retryFunction,
   });
 
-  const handleFileSelect = (fileId: number) => {
+  // Filter files based on debounced search query (memoized for performance)
+  const filteredFiles = useMemo(() => {
+    if (!debouncedSearchQuery.trim()) return files;
+    const query = debouncedSearchQuery.toLowerCase();
+    return files.filter(file => 
+      file.name.toLowerCase().includes(query) ||
+      file.summary?.toLowerCase().includes(query) ||
+      file.tags?.some(tag => tag.toLowerCase().includes(query))
+    );
+  }, [files, debouncedSearchQuery]);
+
+  const handleFileSelect = useCallback((fileId: number) => {
     setSelectedFileId(fileId);
     setShowFilePreview(true);
-  };
+  }, []);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     window.location.href = "/api/logout";
-  };
+  }, []);
 
   if (isLoading || foldersLoading) {
     return (
@@ -169,7 +179,7 @@ export default function Portal() {
                   }
                 </h2>
                 <p className="text-sm text-gray-500">
-                  {files.length} files • Last updated recently
+                  {filteredFiles.length} files{debouncedSearchQuery && ` (${files.length} total)`} • Last updated recently
                 </p>
               </div>
             </div>
@@ -177,7 +187,7 @@ export default function Portal() {
 
           {/* File Grid */}
           <FileGrid
-            files={files}
+            files={filteredFiles}
             isLoading={filesLoading}
             onFileSelect={handleFileSelect}
           />

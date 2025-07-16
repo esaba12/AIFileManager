@@ -65,15 +65,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         validatedData.collaborationStyle
       );
 
-      // Create folders in database
-      for (const folder of folderStructure) {
-        await storage.createFolder({
-          userId,
-          name: folder.name,
-          parentId: folder.parentId,
-          path: folder.path,
-        });
-      }
+      // Create folders in database (optimized with Promise.all)
+      await Promise.all(
+        folderStructure.map(folder => 
+          storage.createFolder({
+            userId,
+            name: folder.name,
+            parentId: folder.parentId,
+            path: folder.path,
+          })
+        )
+      );
 
       res.json({ success: true, folderStructure });
     } catch (error) {

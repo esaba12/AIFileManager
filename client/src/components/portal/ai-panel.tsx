@@ -19,7 +19,7 @@ export default function AIPanel({ onUpload }: AIPanelProps) {
 
   const { data: recentCommands = [] } = useQuery({
     queryKey: ["/api/ai/commands"],
-    refetchInterval: 5000, // Refresh every 5 seconds
+    refetchInterval: false, // Remove polling for better performance
   });
 
   const commandMutation = useMutation({

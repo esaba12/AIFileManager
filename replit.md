@@ -10,14 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-- **January 16, 2025**: Added voice capabilities for enhanced accessibility
-  - Voice recognition for answering onboarding questions by speech
-  - "Talk to Assistant" feature for complete voice-based setup
-  - Voice search capability in the filing system
-  - Intelligent voice-to-text processing with smart answer mapping
-  - Enhanced accessibility for small business owners
-  - Voice buttons on text input fields throughout the interface
-  - Speech synthesis to read questions aloud during voice setup
+- **January 16, 2025**: Performance optimizations for faster app experience
+  - Removed unnecessary API polling (AI commands) that was causing 5-second intervals
+  - Implemented query caching with 5-minute stale time and 10-minute garbage collection
+  - Added search debouncing (300ms) to prevent excessive filtering operations
+  - Optimized database queries with proper ordering and indexing
+  - Memoized expensive operations (file filtering, callback functions)
+  - Used Promise.all for parallel folder creation during onboarding
+  - Improved React rendering performance with useCallback and useMemo
+  - Enhanced error handling with memoized retry functions
 
 ## System Architecture
 
