@@ -51,6 +51,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         industry: validatedData.industry,
         teamSize: validatedData.teamSize,
         businessDescription: validatedData.businessDescription,
+        storageType: validatedData.storageType || "local",
+        storagePlan: validatedData.storagePlan || "basic",
       });
 
       // Generate folder structure using AI
@@ -92,14 +94,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/folders', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
+      const { name, parentId } = req.body;
+      
+      // Build path based on parent folder
+      let path = name;
+      if (parentId) {
+        const parentFolder = await storage.getFolderById(parentId);
+        if (parentFolder) {
+          path = `${parentFolder.path}/${name}`;
+        }
+      }
+      
       const folder = await storage.createFolder({
-        ...req.body,
         userId,
+        name,
+        parentId: parentId || null,
+        path,
       });
       res.json(folder);
     } catch (error) {
       console.error("Error creating folder:", error);
       res.status(500).json({ message: "Failed to create folder" });
+    }
+  });
+
+  app.put('/api/folders/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const folderId = parseInt(req.params.id);
+      const { name, parentId } = req.body;
+      
+      // Build new path if name or parent changed
+      let path = name;
+      if (parentId) {
+        const parentFolder = await storage.getFolderById(parentId);
+        if (parentFolder) {
+          path = `${parentFolder.path}/${name}`;
+        }
+      }
+      
+      const updatedFolder = await storage.updateFolder(folderId, {
+        name,
+        parentId: parentId || null,
+        path,
+      });
+      res.json(updatedFolder);
+    } catch (error) {
+      console.error("Error updating folder:", error);
+      res.status(500).json({ message: "Failed to update folder" });
+    }
+  });
+
+  app.delete('/api/folders/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const folderId = parseInt(req.params.id);
+      
+      // Check if folder has any files or subfolders
+      const files = await storage.getFilesByFolderId(folderId);
+      const allFolders = await storage.getFoldersByUserId(req.user.claims.sub);
+      const subfolders = allFolders.filter(f => f.parentId === folderId);
+      
+      if (files.length > 0 || subfolders.length > 0) {
+        return res.status(400).json({ message: "Cannot delete folder with files or subfolders" });
+      }
+      
+      await storage.deleteFolder(folderId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting folder:", error);
+      res.status(500).json({ message: "Failed to delete folder" });
     }
   });
 
@@ -189,6 +251,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating file:", error);
       res.status(500).json({ message: "Failed to update file" });
+    }
+  });
+
+  app.put('/api/files/:id/move', isAuthenticated, async (req: any, res) => {
+    try {
+      const fileId = parseInt(req.params.id);
+      const { folderId } = req.body;
+      
+      const updatedFile = await storage.updateFile(fileId, {
+        folderId: folderId || null,
+      });
+      res.json(updatedFile);
+    } catch (error) {
+      console.error("Error moving file:", error);
+      res.status(500).json({ message: "Failed to move file" });
     }
   });
 

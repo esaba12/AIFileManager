@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Folder, FolderOpen, FileText } from "lucide-react";
 import { Folder as FolderType } from "@shared/schema";
+import FolderManager from "@/components/ui/folder-manager";
 
 interface SidebarProps {
   folders: FolderType[];
@@ -59,7 +60,12 @@ export default function Sidebar({ folders, selectedFolderId, onFolderSelect }: S
   return (
     <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
       <div className="p-4 border-b border-gray-200">
-        <h2 className="font-semibold text-gray-900">File System</h2>
+        <h2 className="font-semibold text-gray-900 mb-3">File System</h2>
+        <FolderManager 
+          folders={folders}
+          selectedFolderId={selectedFolderId}
+          onFolderSelect={onFolderSelect}
+        />
       </div>
       
       <div className="flex-1 overflow-y-auto">

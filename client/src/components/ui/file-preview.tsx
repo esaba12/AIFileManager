@@ -3,16 +3,24 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { X, Download, FolderOpen, Edit } from "lucide-react";
+import FileActions from "@/components/ui/file-actions";
 
 interface FilePreviewProps {
   fileId: number;
   onClose: () => void;
 }
 
+// We'll need to get folders for the file actions
+import { Folder } from "@shared/schema";
+
 export default function FilePreview({ fileId, onClose }: FilePreviewProps) {
   const { data: file, isLoading } = useQuery({
     queryKey: ["/api/files", fileId],
     enabled: !!fileId,
+  });
+
+  const { data: folders = [] } = useQuery({
+    queryKey: ["/api/folders"],
   });
 
   if (isLoading) {
@@ -129,20 +137,11 @@ export default function FilePreview({ fileId, onClose }: FilePreviewProps) {
               {/* Actions */}
               <div>
                 <h5 className="text-sm font-medium text-gray-700 mb-2">Actions</h5>
-                <div className="space-y-2">
-                  <Button variant="outline" size="sm" className="w-full justify-start">
-                    <Download className="w-4 h-4 mr-2" />
-                    Download
-                  </Button>
-                  <Button variant="outline" size="sm" className="w-full justify-start">
-                    <FolderOpen className="w-4 h-4 mr-2" />
-                    Move to Folder
-                  </Button>
-                  <Button variant="outline" size="sm" className="w-full justify-start">
-                    <Edit className="w-4 h-4 mr-2" />
-                    Edit Tags
-                  </Button>
-                </div>
+                <FileActions 
+                  file={file}
+                  folders={folders}
+                  onClose={onClose}
+                />
               </div>
             </div>
           </div>

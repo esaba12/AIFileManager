@@ -5,10 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Badge } from "@/components/ui/badge";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowRight, ArrowLeft, Check } from "lucide-react";
+import { ArrowRight, ArrowLeft, Check, HardDrive, Cloud, Shield, Zap, DollarSign, CheckCircle } from "lucide-react";
 
 const industries = [
   { value: "real-estate", label: "Real Estate", description: "Property listings, contracts, client docs" },
@@ -23,6 +24,55 @@ const teamSizes = [
   { value: "medium", label: "Medium team (11-50 people)" },
 ];
 
+const storageOptions = [
+  {
+    type: "local",
+    title: "Local Storage",
+    description: "Files stored on your device",
+    icon: HardDrive,
+    pros: ["Free forever", "Complete privacy", "No monthly fees", "Works offline"],
+    cons: ["Limited by device storage", "No automatic backups", "Can't access from other devices"],
+    recommended: "solo"
+  },
+  {
+    type: "cloud",
+    title: "Cloud Storage",
+    description: "Files stored securely in the cloud",
+    icon: Cloud,
+    pros: ["Access from anywhere", "Automatic backups", "Unlimited storage", "Team collaboration"],
+    cons: ["Monthly subscription", "Requires internet", "Third-party storage"],
+    recommended: "small"
+  }
+];
+
+const cloudPlans = [
+  {
+    id: "basic",
+    name: "Basic",
+    price: "$9/month",
+    storage: "100 GB",
+    features: ["Up to 1,000 files", "Basic AI features", "Email support"],
+    recommended: "solo"
+  },
+  {
+    id: "standard",
+    name: "Standard", 
+    price: "$19/month",
+    storage: "500 GB",
+    features: ["Up to 5,000 files", "Advanced AI features", "Priority support", "Team sharing"],
+    recommended: "small",
+    popular: true
+  },
+  {
+    id: "premium",
+    name: "Premium",
+    price: "$39/month", 
+    storage: "2 TB",
+    features: ["Unlimited files", "Premium AI features", "Phone support", "Advanced analytics"],
+    recommended: "medium"
+  }
+];
+
 export default function Onboarding() {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -30,6 +80,8 @@ export default function Onboarding() {
     teamSize: "",
     businessDescription: "",
     folderStructure: "",
+    storageType: "local",
+    storagePlan: "basic",
   });
   const [suggestedStructure, setSuggestedStructure] = useState<any>(null);
   const { toast } = useToast();
@@ -57,7 +109,7 @@ export default function Onboarding() {
   });
 
   const handleNext = () => {
-    if (currentStep < 4) {
+    if (currentStep < 5) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -173,6 +225,127 @@ export default function Onboarding() {
       case 4:
         return (
           <div>
+            <h4 className="text-lg font-semibold text-gray-900 mb-6">Choose your storage option</h4>
+            <div className="space-y-6">
+              {/* Storage Type Selection */}
+              <div>
+                <h5 className="text-md font-medium text-gray-800 mb-4">Storage Type</h5>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {storageOptions.map((option) => {
+                    const Icon = option.icon;
+                    return (
+                      <Card
+                        key={option.type}
+                        className={`cursor-pointer transition-all hover:shadow-md ${
+                          formData.storageType === option.type
+                            ? "ring-2 ring-primary bg-blue-50"
+                            : "hover:border-primary"
+                        }`}
+                        onClick={() => setFormData({ ...formData, storageType: option.type })}
+                      >
+                        <CardContent className="p-6">
+                          <div className="flex items-center gap-3 mb-3">
+                            <Icon className="h-6 w-6 text-primary" />
+                            <h6 className="font-semibold text-gray-900">{option.title}</h6>
+                            {option.recommended === formData.teamSize && (
+                              <Badge variant="secondary" className="text-xs">
+                                Recommended
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-600 mb-4">{option.description}</p>
+                          
+                          {/* Pros */}
+                          <div className="mb-3">
+                            <h6 className="text-xs font-medium text-green-700 mb-1">Benefits:</h6>
+                            <ul className="text-xs text-gray-600 space-y-1">
+                              {option.pros.map((pro, idx) => (
+                                <li key={idx} className="flex items-center gap-1">
+                                  <CheckCircle className="h-3 w-3 text-green-500" />
+                                  {pro}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                          
+                          {/* Cons */}
+                          <div>
+                            <h6 className="text-xs font-medium text-orange-700 mb-1">Consider:</h6>
+                            <ul className="text-xs text-gray-600 space-y-1">
+                              {option.cons.map((con, idx) => (
+                                <li key={idx} className="flex items-center gap-1">
+                                  <span className="h-3 w-3 text-orange-500">•</span>
+                                  {con}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Cloud Plan Selection */}
+              {formData.storageType === "cloud" && (
+                <div>
+                  <h5 className="text-md font-medium text-gray-800 mb-4">Choose your plan</h5>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {cloudPlans.map((plan) => (
+                      <Card
+                        key={plan.id}
+                        className={`cursor-pointer transition-all hover:shadow-md relative ${
+                          formData.storagePlan === plan.id
+                            ? "ring-2 ring-primary bg-blue-50"
+                            : "hover:border-primary"
+                        }`}
+                        onClick={() => setFormData({ ...formData, storagePlan: plan.id })}
+                      >
+                        {plan.popular && (
+                          <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
+                            <Badge className="bg-primary text-white">Most Popular</Badge>
+                          </div>
+                        )}
+                        <CardContent className="p-6">
+                          <div className="text-center mb-4">
+                            <h6 className="font-semibold text-gray-900 mb-1">{plan.name}</h6>
+                            <div className="text-2xl font-bold text-primary mb-1">{plan.price}</div>
+                            <div className="text-sm text-gray-600">{plan.storage} storage</div>
+                            {plan.recommended === formData.teamSize && (
+                              <Badge variant="outline" className="mt-2">
+                                Recommended for you
+                              </Badge>
+                            )}
+                          </div>
+                          <ul className="text-sm text-gray-600 space-y-2">
+                            {plan.features.map((feature, idx) => (
+                              <li key={idx} className="flex items-center gap-2">
+                                <CheckCircle className="h-4 w-4 text-green-500" />
+                                {feature}
+                              </li>
+                            ))}
+                          </ul>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-600">
+                      <Shield className="inline h-4 w-4 mr-1" />
+                      All plans include enterprise-grade security, automatic backups, and 24/7 support.
+                      Cancel anytime with no penalties.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+
+      case 5:
+        return (
+          <div>
             <h4 className="text-lg font-semibold text-gray-900 mb-4">Describe your ideal folder structure</h4>
             <Textarea
               value={formData.folderStructure}
@@ -230,6 +403,8 @@ export default function Onboarding() {
       case 3:
         return formData.businessDescription.trim() !== "";
       case 4:
+        return formData.storageType !== "";
+      case 5:
         return formData.folderStructure.trim() !== "";
       default:
         return false;
@@ -245,7 +420,7 @@ export default function Onboarding() {
               Let's Set Up Your Workspace
             </CardTitle>
             <div className="flex space-x-2">
-              {[1, 2, 3, 4].map((step) => (
+              {[1, 2, 3, 4, 5].map((step) => (
                 <div
                   key={step}
                   className={`w-2 h-2 rounded-full ${
@@ -272,7 +447,7 @@ export default function Onboarding() {
             )}
             
             <div className="ml-auto">
-              {currentStep < 4 ? (
+              {currentStep < 5 ? (
                 <Button 
                   onClick={handleNext} 
                   disabled={!isStepValid()}

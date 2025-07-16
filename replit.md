@@ -8,6 +8,15 @@ This is a comprehensive AI-powered document management platform designed for pro
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+- **January 16, 2025**: Added storage option selection during onboarding
+  - Users can now choose between local storage (free) and cloud storage (paid plans)
+  - Added clear explanations of pros/cons for each storage type
+  - Integrated pricing tiers for cloud storage: Basic ($9/month), Standard ($19/month), Premium ($39/month)
+  - Updated database schema to include storageType and storagePlan fields
+  - Enhanced onboarding flow with storage selection as step 4 of 5
+
 ## System Architecture
 
 ### Frontend Architecture
@@ -62,6 +71,7 @@ Preferred communication style: Simple, everyday language.
 - **File Management**: Drag-and-drop upload with processing options
 - **Search**: Real-time file and folder search functionality
 - **Preview**: Modal-based file preview system
+- **Storage Selection**: User-friendly interface for choosing storage options during onboarding
 
 ## Data Flow
 
@@ -69,9 +79,10 @@ Preferred communication style: Simple, everyday language.
 1. User authenticates via Replit Auth
 2. System creates user profile with basic information
 3. Onboarding flow collects industry, team size, and business description
-4. AI generates initial folder structure based on business context
-5. User can customize and approve folder structure
-6. System creates folder hierarchy in database
+4. User selects storage type (local or cloud) with pricing information
+5. AI generates initial folder structure based on business context
+6. User can customize and approve folder structure
+7. System creates folder hierarchy in database
 
 ### File Upload and Processing
 1. User selects files and processing options (OCR, summarization, tagging)

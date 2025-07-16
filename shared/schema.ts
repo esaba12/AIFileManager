@@ -36,6 +36,8 @@ export const users = pgTable("users", {
   industry: varchar("industry"),
   teamSize: varchar("team_size"),
   businessDescription: text("business_description"),
+  storageType: varchar("storage_type", { enum: ["local", "cloud"] }).default("local"),
+  storagePlan: varchar("storage_plan", { enum: ["basic", "standard", "premium"] }).default("basic"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -110,6 +112,8 @@ export const onboardingSchema = z.object({
   teamSize: z.string().min(1),
   businessDescription: z.string().min(1),
   folderStructure: z.string().min(1),
+  storageType: z.enum(["local", "cloud"]).default("local"),
+  storagePlan: z.enum(["basic", "standard", "premium"]).default("basic"),
 });
 
 export type UpsertUser = z.infer<typeof upsertUserSchema>;
