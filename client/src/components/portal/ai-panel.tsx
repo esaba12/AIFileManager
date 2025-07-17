@@ -67,24 +67,25 @@ export default function AIPanel({ onUpload }: AIPanelProps) {
               placeholder="Try: 'Move all contracts to the legal folder'"
               value={command}
               onChange={(e) => setCommand(e.target.value)}
-              className="pr-20"
+              className="pr-10"
             />
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-              <VoiceButton
-                onTranscript={(text) => setCommand(text)}
-                size="sm"
-                className="h-7 w-7 p-0 min-w-[28px]"
-                disabled={commandMutation.isPending}
-              />
-              <Button
-                type="submit"
-                size="sm"
-                className="h-7 w-7 p-0 min-w-[28px]"
-                disabled={!command.trim() || commandMutation.isPending}
-              >
-                <Send className="w-3 h-3" />
-              </Button>
-            </div>
+            <Button
+              type="submit"
+              size="sm"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+              disabled={!command.trim() || commandMutation.isPending}
+            >
+              <Send className="w-4 h-4" />
+            </Button>
+          </div>
+          
+          <div className="flex justify-center">
+            <VoiceButton
+              onTranscript={(text) => setCommand(text)}
+              size="sm"
+              className="px-3 py-1"
+              disabled={commandMutation.isPending}
+            />
           </div>
 
           <Button onClick={() => onUpload()} className="w-full bg-primary hover:bg-blue-600">
