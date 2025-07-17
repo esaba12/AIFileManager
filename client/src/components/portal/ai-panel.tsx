@@ -52,11 +52,8 @@ export default function AIPanel({ onUpload }: AIPanelProps) {
     }
   };
 
-  const mockActivities = [
-    { type: "success", message: "Document processed", details: "Purchase Agreement.pdf", time: "2 hours ago" },
-    { type: "info", message: "Files organized", details: "3 files moved to Active Properties", time: "1 day ago" },
-    { type: "warning", message: "Needs attention", details: "3 files in Unstructured", time: "2 days ago" },
-  ];
+  // Use real activity data from API or empty array
+  const recentActivities: any[] = [];
 
   return (
     <div className="w-80 bg-white border-l border-gray-200 flex flex-col">
@@ -128,21 +125,27 @@ export default function AIPanel({ onUpload }: AIPanelProps) {
       {/* Recent Activity */}
       <div className="p-4 border-b border-gray-200">
         <h3 className="text-sm font-semibold text-gray-900 mb-3">Recent Activity</h3>
-        <div className="space-y-3">
-          {mockActivities.map((activity, index) => (
-            <div key={index} className="flex items-start space-x-3">
-              <div className={`w-2 h-2 rounded-full mt-2 ${
-                activity.type === 'success' ? 'bg-green-400' :
-                activity.type === 'info' ? 'bg-blue-400' : 'bg-orange-400'
-              }`} />
-              <div className="flex-1">
-                <p className="text-sm text-gray-900">{activity.message}</p>
-                <p className="text-xs text-gray-500">{activity.details}</p>
-                <p className="text-xs text-gray-400">{activity.time}</p>
+        {recentActivities.length > 0 ? (
+          <div className="space-y-3">
+            {recentActivities.map((activity, index) => (
+              <div key={index} className="flex items-start space-x-3">
+                <div className={`w-2 h-2 rounded-full mt-2 ${
+                  activity.type === 'success' ? 'bg-green-400' :
+                  activity.type === 'info' ? 'bg-blue-400' : 'bg-orange-400'
+                }`} />
+                <div className="flex-1">
+                  <p className="text-sm text-gray-900">{activity.message}</p>
+                  <p className="text-xs text-gray-500">{activity.details}</p>
+                  <p className="text-xs text-gray-400">{activity.time}</p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-4">
+            <p className="text-sm text-gray-500">Add your first file to get started</p>
+          </div>
+        )}
       </div>
 
       {/* Quick Actions */}
