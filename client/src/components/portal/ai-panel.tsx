@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { MessageSquare, Upload, Download, Trash2, Settings, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import VoiceButton from "@/components/ui/voice-button";
 
 interface AIPanelProps {
   onUpload: () => void;
@@ -69,16 +70,24 @@ export default function AIPanel({ onUpload }: AIPanelProps) {
               placeholder="Try: 'Move all contracts to the legal folder'"
               value={command}
               onChange={(e) => setCommand(e.target.value)}
-              className="pr-10"
+              className="pr-20"
             />
-            <Button
-              type="submit"
-              size="sm"
-              className="absolute right-1 top-1 h-8 w-8 p-0"
-              disabled={!command.trim() || commandMutation.isPending}
-            >
-              <Send className="w-4 h-4" />
-            </Button>
+            <div className="absolute right-1 top-1 flex gap-1">
+              <VoiceButton
+                onTranscript={(text) => setCommand(text)}
+                size="sm"
+                className="h-8 w-8 p-0"
+                disabled={commandMutation.isPending}
+              />
+              <Button
+                type="submit"
+                size="sm"
+                className="h-8 w-8 p-0"
+                disabled={!command.trim() || commandMutation.isPending}
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
           
           <Button onClick={onUpload} className="w-full bg-primary hover:bg-blue-600">
