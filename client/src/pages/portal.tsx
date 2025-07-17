@@ -12,6 +12,7 @@ import FileGrid from "@/components/portal/file-grid";
 import AIPanel from "@/components/portal/ai-panel";
 import FileUpload from "@/components/ui/file-upload";
 import FilePreview from "@/components/ui/file-preview";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 
 export default function Portal() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -163,42 +164,54 @@ export default function Portal() {
       </div>
 
       <div className="flex h-screen">
-        {/* Sidebar */}
-        <Sidebar
-          folders={folders}
-          selectedFolderId={selectedFolderId}
-          onFolderSelect={setSelectedFolderId}
-        />
-
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col">
-          {/* Content Header */}
-          <div className="bg-white border-b border-gray-200 px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">
-                  {selectedFolderId 
-                    ? folders.find(f => f.id === selectedFolderId)?.name 
-                    : "All Files"
-                  }
-                </h2>
-                <p className="text-sm text-gray-500">
-                  {filteredFiles.length} files{debouncedSearchQuery && ` (${files.length} total)`} • Last updated recently
-                </p>
+        <ResizablePanelGroup direction="horizontal" className="flex">
+          {/* Sidebar */}
+          <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
+            <Sidebar
+              folders={folders}
+              selectedFolderId={selectedFolderId}
+              onFolderSelect={setSelectedFolderId}
+            />
+          </ResizablePanel>
+          
+          <ResizableHandle withHandle />
+          
+          {/* Main Content */}
+          <ResizablePanel defaultSize={60} minSize={40}>
+            <div className="flex flex-col h-full">
+              {/* Content Header */}
+              <div className="bg-white border-b border-gray-200 px-6 py-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      {selectedFolderId 
+                        ? folders.find(f => f.id === selectedFolderId)?.name 
+                        : "All Files"
+                      }
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                      {filteredFiles.length} files{debouncedSearchQuery && ` (${files.length} total)`} • Last updated recently
+                    </p>
+                  </div>
+                </div>
               </div>
+
+              {/* File Grid */}
+              <FileGrid
+                files={filteredFiles}
+                isLoading={filesLoading}
+                onFileSelect={handleFileSelect}
+              />
             </div>
-          </div>
+          </ResizablePanel>
+          
+          <ResizableHandle withHandle />
 
-          {/* File Grid */}
-          <FileGrid
-            files={filteredFiles}
-            isLoading={filesLoading}
-            onFileSelect={handleFileSelect}
-          />
-        </div>
-
-        {/* AI Panel */}
-        <AIPanel onUpload={handleUploadClick} />
+          {/* AI Panel */}
+          <ResizablePanel defaultSize={20} minSize={15} maxSize={35}>
+            <AIPanel onUpload={handleUploadClick} />
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </div>
 
       {/* Upload Modal */}
