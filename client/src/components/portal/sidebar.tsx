@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Folder, FolderOpen, FileText } from "lucide-react";
+import { Folder, FolderOpen, FileText, Upload } from "lucide-react";
 import { Folder as FolderType } from "@shared/schema";
 import FolderManager from "@/components/ui/folder-manager";
 

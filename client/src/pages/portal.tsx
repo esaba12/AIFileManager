@@ -19,6 +19,10 @@ export default function Portal() {
   const [selectedFolderId, setSelectedFolderId] = useState<number | null>(null);
   const [selectedFileId, setSelectedFileId] = useState<number | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
+
+  const handleUploadClick = () => {
+    setShowUploadModal(true);
+  };
   const [showFilePreview, setShowFilePreview] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
@@ -194,7 +198,7 @@ export default function Portal() {
         </div>
 
         {/* AI Panel */}
-        <AIPanel onUpload={() => setShowUploadModal(true)} />
+        <AIPanel onUpload={handleUploadClick} />
       </div>
 
       {/* Upload Modal */}

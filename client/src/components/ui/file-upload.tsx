@@ -106,12 +106,13 @@ export default function FileUpload({ folderId, onClose, onUploadComplete }: File
         <CardContent className="space-y-6">
           {/* Drop Zone */}
           <div
-            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
               dragOver ? "border-primary bg-blue-50" : "border-gray-300 hover:border-primary"
             }`}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
+            onClick={() => document.getElementById('file-input')?.click()}
           >
             <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
             <p className="text-lg text-gray-600 mb-2">Drop files here or click to browse</p>
@@ -124,11 +125,13 @@ export default function FileUpload({ folderId, onClose, onUploadComplete }: File
               className="hidden"
               id="file-input"
             />
-            <Label htmlFor="file-input" className="cursor-pointer">
-              <Button type="button" className="mt-4">
-                Choose Files
-              </Button>
-            </Label>
+            <Button 
+              type="button" 
+              className="mt-4"
+              onClick={() => document.getElementById('file-input')?.click()}
+            >
+              Choose Files
+            </Button>
           </div>
 
           {/* Selected Files */}

@@ -89,8 +89,8 @@ export default function AIPanel({ onUpload }: AIPanelProps) {
               </Button>
             </div>
           </div>
-          
-          <Button onClick={onUpload} className="w-full bg-primary hover:bg-blue-600">
+
+          <Button onClick={() => onUpload()} className="w-full bg-primary hover:bg-blue-600">
             <Upload className="w-4 h-4 mr-2" />
             Add Files
           </Button>
