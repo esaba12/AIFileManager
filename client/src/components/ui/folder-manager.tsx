@@ -179,7 +179,7 @@ export default function FolderManager({ folders, selectedFolderId, onFolderSelec
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="root">No parent (root level)</SelectItem>
-                  {folders.map((folder) => (
+                  {getAvailableParents().map((folder) => (
                     <SelectItem key={folder.id} value={folder.id.toString()}>
                       {folder.name}
                     </SelectItem>
