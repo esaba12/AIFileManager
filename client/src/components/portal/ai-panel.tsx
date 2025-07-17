@@ -69,20 +69,20 @@ export default function AIPanel({ onUpload }: AIPanelProps) {
               onChange={(e) => setCommand(e.target.value)}
               className="pr-20"
             />
-            <div className="absolute right-1 top-1 flex gap-1">
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
               <VoiceButton
                 onTranscript={(text) => setCommand(text)}
                 size="sm"
-                className="h-8 w-8 p-0"
+                className="h-7 w-7 p-0 min-w-[28px]"
                 disabled={commandMutation.isPending}
               />
               <Button
                 type="submit"
                 size="sm"
-                className="h-8 w-8 p-0"
+                className="h-7 w-7 p-0 min-w-[28px]"
                 disabled={!command.trim() || commandMutation.isPending}
               >
-                <Send className="w-4 h-4" />
+                <Send className="w-3 h-3" />
               </Button>
             </div>
           </div>
