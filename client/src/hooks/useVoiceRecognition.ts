@@ -37,7 +37,23 @@ export function useVoiceRecognition({
       };
       
       recognition.onerror = (event: any) => {
-        const errorMessage = event.error || "Speech recognition error";
+        let errorMessage = "Speech recognition error";
+        switch (event.error) {
+          case 'no-speech':
+            errorMessage = "No speech detected. Please try again.";
+            break;
+          case 'audio-capture':
+            errorMessage = "Microphone not accessible. Please check your microphone settings.";
+            break;
+          case 'not-allowed':
+            errorMessage = "Microphone access denied. Please allow microphone access and try again.";
+            break;
+          case 'network':
+            errorMessage = "Network error. Please check your internet connection.";
+            break;
+          default:
+            errorMessage = event.error || "Speech recognition error";
+        }
         onError?.(errorMessage);
         setIsListening(false);
       };
@@ -61,8 +77,19 @@ export function useVoiceRecognition({
   const startListening = () => {
     if (recognitionRef.current && !isListening) {
       try {
-        recognitionRef.current.start();
-        setIsListening(true);
+        // Request microphone permission first
+        navigator.mediaDevices.getUserMedia({ audio: true })
+          .then(() => {
+            recognitionRef.current.start();
+            setIsListening(true);
+          })
+          .catch((error) => {
+            if (error.name === 'NotAllowedError') {
+              onError?.("Microphone access denied. Please allow microphone access and try again.");
+            } else {
+              onError?.("Failed to access microphone. Please check your microphone settings.");
+            }
+          });
       } catch (error) {
         onError?.("Failed to start voice recognition");
       }

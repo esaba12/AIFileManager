@@ -44,10 +44,29 @@ export default function VoiceAssistant({
 
   const speakQuestion = (question: string) => {
     if ('speechSynthesis' in window) {
+      // Cancel any current speech
+      speechSynthesis.cancel();
+      
       const utterance = new SpeechSynthesisUtterance(question);
-      utterance.rate = 0.8;
-      utterance.pitch = 1;
+      
+      // Get available voices and prefer more natural ones
+      const voices = speechSynthesis.getVoices();
+      const preferredVoice = voices.find(voice => 
+        voice.name.includes('Natural') || 
+        voice.name.includes('Enhanced') ||
+        voice.name.includes('Premium') ||
+        (voice.lang === 'en-US' && voice.name.includes('Female'))
+      ) || voices.find(voice => voice.lang === 'en-US' && voice.default);
+      
+      if (preferredVoice) {
+        utterance.voice = preferredVoice;
+      }
+      
+      // More natural speech settings
+      utterance.rate = 0.9;
+      utterance.pitch = 1.1;
       utterance.volume = 0.8;
+      
       speechSynthesis.speak(utterance);
     }
   };
@@ -68,6 +87,25 @@ export default function VoiceAssistant({
       setTimeout(() => {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
         speakQuestion(questions[currentQuestionIndex + 1]);
+        
+        // Auto-start listening for next answer
+        setTimeout(() => {
+          if (!voiceListening) {
+            startListening();
+            setIsListening(true);
+          }
+        }, 3000);
+      }, 1500);
+    } else {
+      // Conversation complete
+      const completionMessage = "Great! I have all your answers. You can review them or complete the setup.";
+      setTimeout(() => {
+        if ('speechSynthesis' in window) {
+          const utterance = new SpeechSynthesisUtterance(completionMessage);
+          utterance.rate = 0.9;
+          utterance.pitch = 1.1;
+          speechSynthesis.speak(utterance);
+        }
       }, 1000);
     }
   };
@@ -76,7 +114,23 @@ export default function VoiceAssistant({
     setCurrentQuestionIndex(0);
     setAnswers([]);
     setIsListening(false);
-    speakQuestion(questions[0]);
+    
+    // Wait for voices to load, then speak
+    if (speechSynthesis.getVoices().length === 0) {
+      speechSynthesis.addEventListener('voiceschanged', () => {
+        speakQuestion(questions[0]);
+      }, { once: true });
+    } else {
+      speakQuestion(questions[0]);
+    }
+    
+    // Auto-start listening after speaking
+    setTimeout(() => {
+      if (!voiceListening) {
+        startListening();
+        setIsListening(true);
+      }
+    }, 2000);
   };
 
   const handleVoiceToggle = () => {

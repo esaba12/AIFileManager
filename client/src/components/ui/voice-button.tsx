@@ -44,7 +44,7 @@ export default function VoiceButton({
     language: "en-US"
   });
 
-  const handleVoiceClick = () => {
+  const handleVoiceClick = async () => {
     if (!isSupported) {
       toast({
         title: "Voice not supported",
@@ -58,11 +58,29 @@ export default function VoiceButton({
       stopListening();
       setIsProcessing(true);
     } else {
-      startListening();
-      toast({
-        title: "Listening...",
-        description: "Speak clearly and click the microphone again when finished.",
-      });
+      try {
+        // Request permission first
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        startListening();
+        toast({
+          title: "Listening...",
+          description: "Speak clearly and click the microphone again when finished.",
+        });
+      } catch (error: any) {
+        if (error.name === 'NotAllowedError') {
+          toast({
+            title: "Microphone access denied",
+            description: "Please allow microphone access in your browser settings and try again.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Microphone error",
+            description: "Unable to access microphone. Please check your settings.",
+            variant: "destructive",
+          });
+        }
+      }
     }
   };
 
