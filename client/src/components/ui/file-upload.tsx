@@ -112,7 +112,10 @@ export default function FileUpload({ folderId, onClose, onUploadComplete }: File
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
-            onClick={() => document.getElementById('file-input')?.click()}
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('file-input')?.click();
+            }}
           >
             <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
             <p className="text-lg text-gray-600 mb-2">Drop files here or click to browse</p>
@@ -121,14 +124,21 @@ export default function FileUpload({ folderId, onClose, onUploadComplete }: File
               type="file"
               multiple
               accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.txt"
-              onChange={(e) => e.target.files && handleFileSelect(e.target.files)}
+              onChange={(e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                  handleFileSelect(e.target.files);
+                }
+              }}
               className="hidden"
               id="file-input"
             />
             <Button 
               type="button" 
               className="mt-4"
-              onClick={() => document.getElementById('file-input')?.click()}
+              onClick={(e) => {
+                e.stopPropagation();
+                document.getElementById('file-input')?.click();
+              }}
             >
               Choose Files
             </Button>
